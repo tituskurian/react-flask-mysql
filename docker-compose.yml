@@ -1,0 +1,29 @@
+services:
+  mysql:
+    build: ./mysql/
+    restart: always
+    image: mysql:latest
+    command: --max_allowed_packet=1073741824 --sql_mode=  --pid-file /var/lib/mysql/mysqld.pid
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: 'mysampledb'
+      WAIT_TIMEOUT: 3600 # Example: 1 hour
+      INTERACTIVE_TIMEOUT: 3600 
+    ports:
+      - "3306:3306"
+    networks:
+      - my_network
+  web:
+    build: ./flask-mysql/
+    ports:
+      - "5000:5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: 'root'
+      MYSQL_DB: 'mysampledb'
+    depends_on:
+      - mysql
+    networks:
+      - my_network
+networks:
+  my_network:
